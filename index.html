@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PureWayu | Technical Architecture</title>
+<style>
+:root{--b:#1457c5;--d:#0b3b91;--t:#172033;--m:#5d687b;--l:#dbe3ef;--bg:#f7f9fc}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:15px/1.55 Segoe UI,Arial,sans-serif;color:var(--t);background:var(--bg)}
+a{text-decoration:none;color:inherit}.wrap{width:min(1160px,92%);margin:auto}
+nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--l);z-index:5}.nav{height:62px;display:flex;align-items:center;justify-content:space-between}.logo{font-size:23px;font-weight:800;color:var(--b)}.links{display:flex;gap:20px;color:var(--m);font-size:13px}
+.hero{background:#fff;padding:65px 0;border-bottom:1px solid var(--l)}.heroGrid{display:grid;grid-template-columns:1.35fr .65fr;gap:35px}.k{color:var(--b);font-weight:800;text-transform:uppercase;letter-spacing:.08em;font-size:12px}h1{font-size:64px;line-height:1;margin:10px 0;color:var(--d)}.hero p{font-size:18px;color:var(--m);max-width:720px}.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}.tag{border:1px solid #cbd9f2;background:#f5f8ff;border-radius:20px;padding:6px 10px;font-size:12px}
+.flow{background:#172033;color:white;border-radius:15px;padding:20px}.flow h3{margin-top:0}.flow div{background:#273149;border-radius:8px;padding:9px;margin:6px 0;font-size:13px;text-align:center}.flow b{display:block;color:#a9c8ff;text-align:center}
+section{padding:55px 0}.white{background:#fff}.title{margin-bottom:24px}.title h2{font-size:32px;color:var(--d);margin:0 0 5px}.title p{color:var(--m);margin:0}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card{background:#fff;border:1px solid var(--l);border-radius:14px;padding:21px;box-shadow:0 6px 20px #182d5010}.card h3{color:var(--d);margin:0 0 8px}.card p,.card li{color:var(--m)}.card ul{padding-left:20px}
+.arch{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.node{background:#fff;border:2px solid #bdd0f1;border-radius:12px;padding:15px 11px;position:relative}.node:not(:last-child):after{content:"→";position:absolute;right:-16px;top:42%;color:var(--b);font-size:20px;font-weight:bold}.node h3{font-size:15px;color:var(--d);margin:0 0 7px}.node p{font-size:12.5px;color:var(--m);margin:0}
+.pipeline{display:flex;overflow:auto}.step{min-width:175px;background:#fff;border:1px solid var(--l);padding:16px;position:relative}.step:first-child{border-radius:10px 0 0 10px}.step:last-child{border-radius:0 10px 10px 0}.step:not(:last-child):after{content:"→";position:absolute;right:-14px;top:42%;z-index:2;background:var(--b);color:#fff;border-radius:50%;width:27px;height:27px;text-align:center;line-height:27px}.step b{color:var(--d);display:block}.step span{font-size:12px;color:var(--m)}
+table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--l);border-radius:12px;overflow:hidden}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--l)}th{background:#eef3fa;color:var(--d)}td{color:var(--m)}
+.note{border-left:4px solid var(--b);background:#eef4ff;padding:16px 18px;border-radius:7px;margin-top:18px}.note strong{color:var(--d)}
+pre{background:#111827;color:#e6edf7;padding:20px;border-radius:12px;overflow:auto;font-size:13px}
+footer{background:#111a2b;color:#aeb8c9;padding:30px 0}footer strong{color:#fff}
+@media(max-width:900px){.heroGrid,.grid2{grid-template-columns:1fr}.grid3{grid-template-columns:1fr 1fr}.arch{grid-template-columns:1fr 1fr}.node:not(:last-child):after{display:none}.links{display:none}}
+@media(max-width:600px){.grid3{grid-template-columns:1fr}.arch{grid-template-columns:1fr}h1{font-size:46px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap nav"><a class="logo" href="#top">PureWayu</a><div class="links">
+<a href="#architecture">Architecture</a><a href="#data">Data</a><a href="#models">AI Models</a><a href="#wrf">WRF-Chem</a><a href="#deployment">Deployment</a></div></div></nav>
+
+<header class="hero" id="top"><div class="wrap heroGrid"><div>
+<div class="k">Delhi NCR • Environmental Intelligence</div><h1>PureWayu</h1>
+<p><b>Air Pollution Weather Coupled Forecasting System</b> — a physics-informed forecasting platform combining atmospheric modelling, observations, satellite/fire information, emissions and machine learning to forecast pollution evolution across Delhi NCR.</p>
+<div class="tags"><span class="tag">0–72 hour forecasting</span><span class="tag">WRF-Chem + AI/ML</span><span class="tag">Multi-source data</span><span class="tag">AQI & risk maps</span><span class="tag">Web + Mobile</span></div>
+</div><div class="flow"><h3>Core Technical Flow</h3>
+<div>Weather + Ground AQ + Satellite/Fire + Emissions</div><b>↓</b><div>Quality Control + Time/Space Alignment</div><b>↓</b><div>WRF-Chem + Physics Features</div><b>↓</b><div>XGBoost / LSTM / Transformer</div><b>↓</b><div>Bias Correction</div><b>↓</b><div>Pollution Forecast → CPCB AQI → Maps & Alerts</div>
+</div></div></header>
+
+<section><div class="wrap"><div class="title"><h2>The Problem</h2><p>Delhi NCR pollution changes with emissions and atmospheric conditions.</p></div>
+<div class="grid3"><div class="card"><h3>High variability</h3><p>Pollution can change rapidly with wind, temperature, rainfall, atmospheric stability and source activity.</p></div>
+<div class="card"><h3>Fragmented information</h3><p>Ground observations, weather forecasts, satellite fire data and emission inventories come from different systems.</p></div>
+<div class="card"><h3>Forecasting challenge</h3><p>A current AQI describes the present. PureWayu estimates how pollution may evolve over the next 0–72 hours.</p></div></div></div></section>
+
+<section class="white" id="architecture"><div class="wrap"><div class="title"><h2>System Architecture</h2><p>Different layers perform different jobs.</p></div>
+<div class="arch">
+<div class="node"><h3>01. Data Sources</h3><p>Weather, ground AQ, satellite/fire, emissions and GIS data.</p></div>
+<div class="node"><h3>02. Preprocessing</h3><p>Cleaning, QC, units, time alignment and spatial mapping.</p></div>
+<div class="node"><h3>03. WRF-Chem</h3><p>Meteorology, atmospheric transport and chemistry simulation.</p></div>
+<div class="node"><h3>04. AI / ML</h3><p>Forecasts using physics, observations and source features.</p></div>
+<div class="node"><h3>05. Correction</h3><p>Uses recent observations to correct systematic errors.</p></div>
+<div class="node"><h3>06. Decision Layer</h3><p>Pollutants → AQI → maps, risk levels and alerts.</p></div>
+</div><div class="note"><strong>Key idea:</strong> WRF-Chem provides atmospheric context; AI learns relationships between that context, observations and source information to produce an operational forecast.</div></div></section>
+
+<section id="data"><div class="wrap"><div class="title"><h2>Data Layer</h2><p>Complementary sources are combined instead of relying on one dataset.</p></div>
+<div class="grid2">
+<div class="card"><h3>Weather</h3><ul><li>GFS / ECMWF forecasts</li><li>Wind, temperature, humidity and rainfall</li><li>Boundary-layer and stability information</li></ul></div>
+<div class="card"><h3>Ground Air Quality</h3><ul><li>CPCB / SAFAR / OpenAQ where available</li><li>PM2.5, PM10, O₃, NO₂ and other available pollutants</li><li>Training, validation and correction</li></ul></div>
+<div class="card"><h3>Satellite & Fire</h3><ul><li>VIIRS / MODIS / NASA FIRMS</li><li>Fire location and timing features</li><li>Biomass-burning source signals</li></ul></div>
+<div class="card"><h3>Emissions & GIS</h3><ul><li>Emission inventories such as EDGAR/REAS where applicable</li><li>Road, population and land-use context</li><li>Spatial source/exposure features</li></ul></div>
+</div></div></section>
+
+<section class="white"><div class="wrap"><div class="title"><h2>Data Processing</h2><p>Raw data becomes one consistent modelling dataset.</p></div>
+<div class="pipeline">
+<div class="step"><b>1. Ingestion</b><span>APIs, files and model inputs</span></div><div class="step"><b>2. Quality Control</b><span>Missing, duplicate, outlier and range checks</span></div><div class="step"><b>3. Alignment</b><span>Common time, units and grid</span></div><div class="step"><b>4. Features</b><span>Lags, weather, PBL, inversion, fire and emissions</span></div><div class="step"><b>5. Physics</b><span>Extract WRF-Chem variables from NetCDF</span></div><div class="step"><b>6. ML Dataset</b><span>Chronological train/validation/test</span></div>
+</div></div></section>
+
+<section id="wrf"><div class="wrap"><div class="title"><h2>WRF-Chem Layer</h2><p>High-fidelity atmospheric simulation forms the physics layer.</p></div>
+<div class="grid2"><div class="card"><h3>What WRF-Chem does</h3><ul><li>Simulates meteorology and atmospheric chemistry together.</li><li>Represents pollutant transport and dispersion.</li><li>Provides boundary-layer and regional-transport information.</li><li>Produces NetCDF outputs for Python processing.</li></ul></div>
+<div class="card"><h3>How PureWayu uses it</h3><ul><li>Define a Delhi-NCR domain including relevant upwind regions.</li><li>Use temperature, wind, humidity, PBLH and pollutant/aerosol fields.</li><li>Extract physics-derived features with Python/xarray.</li><li>Feed those features to the ML forecasting layer.</li></ul></div></div>
+<div class="note"><strong>Compute:</strong> WRF-Chem is computationally intensive. Cloud or institutional/HPC resources may be used for high-fidelity simulations; lightweight ML handles routine inference.</div></div></section>
+
+<section class="white" id="models"><div class="wrap"><div class="title"><h2>AI / ML Models</h2><p>A lightweight primary model is paired with temporal benchmarks.</p></div>
+<div class="grid3"><div class="card"><h3>XGBoost — Primary</h3><p>Tree-based model for weather, observations, WRF-Chem, fire and emission features.</p><ul><li>Fast inference</li><li>Nonlinear relationships</li><li>Operationally lightweight</li></ul></div>
+<div class="card"><h3>LSTM — Benchmark</h3><p>Sequence model for temporal pollution and weather patterns.</p><ul><li>Captures sequential dependencies</li><li>Useful for comparison</li></ul></div>
+<div class="card"><h3>Transformer — Benchmark</h3><p>Attention-based model for longer and complex temporal relationships.</p><ul><li>Temporal attention</li><li>Benchmark against lighter models</li></ul></div></div>
+<div class="grid3" style="margin-top:18px"><div class="card"><h3>Inputs</h3><p>Pollution + weather + WRF-Chem + fire + emissions + temporal features.</p></div><div class="card"><h3>Targets</h3><p>PM2.5, PM10, O₃, NO₂ and derived AQI.</p></div><div class="card"><h3>Evaluation</h3><p>Chronological split with MAE, RMSE and R² against baseline models.</p></div></div>
+</div></section>
+
+<section><div class="wrap"><div class="title"><h2>Observation-Based Bias Correction</h2><p>The raw forecast is not assumed to be perfect.</p></div>
+<div class="grid2"><div class="card"><h3>Why</h3><p>Forecast errors can vary by location, season, weather regime and pollution episode.</p></div><div class="card"><h3>How</h3><p>Historical forecast–observation pairs learn systematic errors; recent observations help adjust the current forecast.</p></div></div>
+<div class="note"><strong>Flow:</strong> Raw forecast → compare with observations → estimate error → corrected forecast → AQI / alerts.</div></div></section>
+
+<section class="white"><div class="wrap"><div class="title"><h2>Forecast & Decision Layer</h2><p>Predictions are converted into information people and authorities can use.</p></div>
+<div class="grid3"><div class="card"><h3>Pollutant Forecast</h3><p>Hourly future concentrations for selected pollutants.</p></div><div class="card"><h3>CPCB AQI</h3><p>Predicted concentrations are converted using the applicable CPCB AQI methodology and available pollutant inputs.</p></div><div class="card"><h3>Risk & Alerts</h3><p>Maps, risk levels, drivers and alerts communicate changing conditions.</p></div></div></div></section>
+
+<section id="deployment"><div class="wrap"><div class="title"><h2>Technology & Deployment</h2><p>Modular components make the system reproducible and deployable.</p></div>
+<div style="overflow:auto"><table><tr><th>Layer</th><th>Technology</th><th>Role</th></tr>
+<tr><td>Data processing</td><td>Python, Pandas, NumPy, Xarray, GeoPandas</td><td>Cleaning, alignment, features and NetCDF processing</td></tr>
+<tr><td>Atmospheric modelling</td><td>WRF-Chem + WPS</td><td>Meteorology, chemistry and transport</td></tr>
+<tr><td>AI / ML</td><td>XGBoost, LSTM, Transformer</td><td>Forecasting and comparison</td></tr>
+<tr><td>Database</td><td>PostgreSQL / PostGIS</td><td>Sensor, forecast and spatial data</td></tr>
+<tr><td>Backend</td><td>FastAPI</td><td>APIs and application services</td></tr>
+<tr><td>Containers</td><td>Docker</td><td>Reproducible environments</td></tr>
+<tr><td>Frontend</td><td>Web dashboard + Flutter</td><td>Maps, forecasts and alerts</td></tr>
+<tr><td>Maps</td><td>OpenStreetMap / GIS</td><td>Spatial visualization</td></tr>
+</table></div></div></section>
+
+<section class="white"><div class="wrap"><div class="title"><h2>Containerized Technical Flow</h2><p>Docker can separate the atmospheric model from the operational software.</p></div>
+<pre>WRF-Chem Container
+WPS → WRF-Chem → NetCDF
+          │
+          ▼
+Python / Xarray
+physics features + data fusion
+          │
+          ▼
+ML Container
+XGBoost / LSTM / Transformer
+          │
+          ▼
+Bias Correction
+          │
+          ▼
+FastAPI + PostgreSQL/PostGIS
+          │
+      ┌───┴───┐
+      ▼       ▼
+    Web     Flutter</pre></div></section>
+
+<section><div class="wrap"><div class="title"><h2>PureWayu in One Sentence</h2></div>
+<div class="note" style="font-size:18px"><strong>PureWayu combines atmospheric physics, multi-source environmental data and AI/ML to turn observations into spatial air-pollution forecasts and actionable AQI information for Delhi NCR.</strong></div></div></section>
+
+<footer><div class="wrap"><strong>PureWayu</strong><br>Air Pollution Weather Coupled Forecasting System — Delhi NCR Focus</div></footer>
+</body></html>
